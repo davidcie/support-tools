@@ -183,13 +183,13 @@ try
    }
    else
    {
-      Write-Warning "Unable to find PFX file $PFXFile"
+      Write-Error "Unable to find PFX file $PFXFile"
       Exit
    }
 }
 catch
 {
-   Write-Warning "Unable to acces PFX file $PFXFile"
+   Write-Error "Unable to acces PFX file $PFXFile"
    Exit
 }
 
@@ -197,31 +197,31 @@ try
 {
    if (-not ($cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($pfxPath, $Passphrase, 'Exportable')))
    {
-      Write-Warning "Unable to load certificate $PFXFile"
+      Write-Error "Unable to load certificate $PFXFile"
       Exit
    }
 }
 catch
 {
-   Write-Warning "Unable to load certificate $PFXFile - $($_.Exception.Message)"
+   Write-Error "Unable to load certificate $PFXFile - $($_.Exception.Message)"
    Exit
 }
 
 if (-not $cert.HasPrivateKey) 
 {
-   Write-Warning "No private key present for $($cert.SubjectName.Name)"
+   Write-Error "No private key present for $($cert.SubjectName.Name)"
    Exit
 }
 
 if (-not $cert.PrivateKey.CspKeyContainerInfo.Exportable)
 {
-   Write-Warning "Cannot find exportable private key for $($cert.SubjectName.Name)"
+   Write-Error "Cannot find exportable private key for $($cert.SubjectName.Name)"
    Exit
 }
 
 if ($CertOnly -and $KeyOnly)
 {
-   Write-Warning "CertOnly and KeyOnly parameters are mutually exclusive"
+   Write-Error "CertOnly and KeyOnly parameters are mutually exclusive"
    Exit
 }
 
@@ -260,9 +260,9 @@ try
       $result | Out-File -Encoding ASCII -ErrorAction Stop -NoClobber $PEMFile
    }
    
-   Write-Host "PEM certficate written to $PEMFile"
+   Write-Output "PEM certficate written to $PEMFile"
 }
 catch
 {
-   Write-Warning "Error writing to $PEMFile - $($_.Exception.Message)"
+   Write-Error "Error writing to $PEMFile - $($_.Exception.Message)"
 }
