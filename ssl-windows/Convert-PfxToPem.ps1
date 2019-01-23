@@ -203,22 +203,23 @@ if (-not $cert.PrivateKey.CspKeyContainerInfo.Exportable)
 
 if ($CertOnly -and $KeyOnly)
 {
-    Write-Warning "CertOnly and KeyOnly parameters are mutually exclusive"
+   Write-Warning "CertOnly and KeyOnly parameters are mutually exclusive"
+   Exit
 }
 
 if (-not $KeyOnly)
 {
-    $result = [MongoDB_Utils]::PfxCertificateToPem($cert)
+   $result = [MongoDB_Utils]::PfxCertificateToPem($cert)
 }
 
 if (-not $CertOnly)
 {
-    $parameters = ([Security.Cryptography.RSACryptoServiceProvider] $cert.PrivateKey).ExportParameters($true)
-    if ($result)
-    {
-        $result += "`r`n"
-    }
-    $result += [MongoDB_Utils]::RsaPrivateKeyToPem($parameters);
+   $parameters = ([Security.Cryptography.RSACryptoServiceProvider] $cert.PrivateKey).ExportParameters($true)
+   if ($result)
+   {
+       $result += "`r`n"
+   }
+   $result += [MongoDB_Utils]::RsaPrivateKeyToPem($parameters);
 }
 
 if (-not $PEMFile)
