@@ -21,6 +21,8 @@
      Export only the certificate part of PFX file.
    .PARAMETER KeyOnly
      Export only the key part of PFX file.
+   .PARAMETER CertChain
+     Include intermediate and root certificates (if any).
 #>
 
 #
@@ -63,7 +65,9 @@ Param(
 
      [switch] $CertOnly = $false,
 
-     [switch] $KeyOnly = $false
+     [switch] $KeyOnly = $false,
+	 
+	 [switch] $CertChain = $false
 )
 
 Add-Type @'
@@ -121,6 +125,26 @@ Add-Type @'
          result.AddRange(data);
          return result.ToArray();
       }
+	  
+	  public static X509Certificate2 FindEndCert(X509Certificate2Collection store)
+	  {
+		foreach (var cert in store)
+		{
+			if (cert.HasPrivateKey)
+				return cert;
+		}
+		return null;
+	  }
+	  
+	  public static X509Certificate2 FindCertFor(X509Certificate2Collection store, string subjectName)
+	  {
+		foreach (var cert in store)
+		{
+			if (cert.SubjectName.Name == subjectName)
+				return cert;
+		}
+		return null;
+	  }
        
       public static string RsaPrivateKeyToPem(RSAParameters privateKey)
       {
@@ -203,9 +227,19 @@ catch
 try
 {
    $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bxor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
-   if (-not ($cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($pfxPath, $Passphrase, $keyImportFlags)))
+   $certs = New-Object Security.Cryptography.X509Certificates.X509Certificate2Collection
+   $certs.Import($pfxPath, $Passphrase, $keyImportFlags)
+   if ($certs.Count -eq 1)
    {
-      Write-Error "Unable to load certificate $PFXFile"
+      $cert = $certs[0]
+   }
+   else
+   {
+      $cert = [MongoDB_Utils]::FindEndCert($certs)
+   }
+   if (-not $cert)
+   {
+      Write-Error "Unable to find a certificate in $PFXFile"
       Exit
    }
 }
@@ -233,6 +267,18 @@ if (-not $CertOnly)
 if (-not $KeyOnly)
 {
    $result = [MongoDB_Utils]::PfxCertificateToPem($cert)
+   if ($CertChain)
+   {
+      # Navigate the trust chain until possible
+	  $inter = [MongoDB_Utils]::FindCertFor($certs, $cert.Issuer)
+	  while ($inter)
+	  {
+	     $result += "`r`n"
+		 $result += [MongoDB_Utils]::PfxCertificateToPem($inter)
+		 $inter = [MongoDB_Utils]::FindCertFor($certs, $inter.Issuer)
+	  }
+      
+   }
 }
 
 if (-not $CertOnly)
