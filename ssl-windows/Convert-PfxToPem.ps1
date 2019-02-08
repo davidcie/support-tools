@@ -195,7 +195,8 @@ catch
 
 try
 {
-   if (-not ($cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($pfxPath, $Passphrase, 'Exportable')))
+   $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bxor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
+   if (-not ($cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($pfxPath, $Passphrase, $keyImportFlags)))
    {
       Write-Error "Unable to load certificate $PFXFile"
       Exit
