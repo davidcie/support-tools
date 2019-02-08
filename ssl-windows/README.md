@@ -9,7 +9,7 @@ To use an X.509 certificate contained in a Windows Certificate Store, export the
 
 Command line syntax:
 
-`Convert-PfxToPem.ps1 [-PFXFile] <string> [[-PEMFile] <string>] [-Passphrase <string>] [-Overwrite]`
+`Convert-PfxToPem.ps1 [-PFXFile] <string> [[-PEMFile] <string>] [-Passphrase <string>] [-Overwrite] [-CertOnly|-KeyOnly] [-CertChain]`
 
 Required parameters:
 
@@ -21,6 +21,9 @@ Optional parameters:
   * If this is not supplied you will be prompted interactively.
 - `-Passphase <passphrase>` - Supply this if the private key of the PFX is password protected.
 - `-Overwrite` - Add this switch to overwrite any existing PEMFile.
+- `-CertOnly` - Add this switch to export only the public key / certificate.
+- `-KeyOnly` - Add this switch to export only the private key.
+- `-CertChain` - Add this switch to include intermediate and root certificates (if any).
 
 ### License
 
