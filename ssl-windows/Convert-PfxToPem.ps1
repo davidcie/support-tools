@@ -175,6 +175,13 @@ Add-Type @'
       }
    }
 '@
+
+if ($CertOnly -and $KeyOnly)
+{
+   Write-Error "CertOnly and KeyOnly parameters are mutually exclusive"
+   Exit
+}
+
 try
 {
    if (Test-Path -Path $PFXFile -PathType Leaf)
@@ -208,22 +215,19 @@ catch
    Exit
 }
 
-if (-not $cert.HasPrivateKey) 
+if (-not $CertOnly)
 {
-   Write-Error "No private key present for $($cert.SubjectName.Name)"
-   Exit
-}
+	if (-not $cert.HasPrivateKey) 
+	{
+	   Write-Error "No private key present for $($cert.SubjectName.Name)"
+	   Exit
+	}
 
-if (-not $cert.PrivateKey.CspKeyContainerInfo.Exportable)
-{
-   Write-Error "Cannot find exportable private key for $($cert.SubjectName.Name)"
-   Exit
-}
-
-if ($CertOnly -and $KeyOnly)
-{
-   Write-Error "CertOnly and KeyOnly parameters are mutually exclusive"
-   Exit
+	if (-not $cert.PrivateKey.CspKeyContainerInfo.Exportable)
+	{
+	   Write-Error "Cannot find exportable private key for $($cert.SubjectName.Name)"
+	   Exit
+	}
 }
 
 if (-not $KeyOnly)
