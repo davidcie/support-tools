@@ -226,7 +226,7 @@ catch
 
 try
 {
-   $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bxor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
+   $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
    $certs = New-Object Security.Cryptography.X509Certificates.X509Certificate2Collection
    $certs.Import($pfxPath, $Passphrase, $keyImportFlags)
    if ($certs.Count -eq 1)
