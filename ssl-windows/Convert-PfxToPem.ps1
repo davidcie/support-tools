@@ -126,25 +126,25 @@ Add-Type @'
          return result.ToArray();
       }
 	  
-	  public static X509Certificate2 FindEndCert(X509Certificate2Collection store)
-	  {
-		foreach (var cert in store)
-		{
-			if (cert.HasPrivateKey)
-				return cert;
-		}
-		return null;
-	  }
+      public static X509Certificate2 FindEndCert(X509Certificate2Collection store)
+      {
+         foreach (var cert in store)
+         {
+            if (cert.HasPrivateKey)
+               return cert;
+         }
+         return null;
+      }
 	  
-	  public static X509Certificate2 FindCertFor(X509Certificate2Collection store, string subjectName)
-	  {
-		foreach (var cert in store)
-		{
-			if (cert.SubjectName.Name == subjectName)
-				return cert;
-		}
-		return null;
-	  }
+      public static X509Certificate2 FindCertFor(X509Certificate2Collection store, string subjectName)
+      {
+         foreach (var cert in store)
+         {
+            if (cert.SubjectName.Name == subjectName)
+               return cert;
+         }
+         return null;
+      }
        
       public static string RsaPrivateKeyToPem(RSAParameters privateKey)
       {
