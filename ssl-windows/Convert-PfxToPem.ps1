@@ -126,25 +126,25 @@ Add-Type @'
          return result.ToArray();
       }
 	  
-	  public static X509Certificate2 FindEndCert(X509Certificate2Collection store)
-	  {
-		foreach (var cert in store)
-		{
-			if (cert.HasPrivateKey)
-				return cert;
-		}
-		return null;
-	  }
+      public static X509Certificate2 FindEndCert(X509Certificate2Collection store)
+      {
+         foreach (var cert in store)
+         {
+            if (cert.HasPrivateKey)
+               return cert;
+         }
+         return null;
+      }
 	  
-	  public static X509Certificate2 FindCertFor(X509Certificate2Collection store, string subjectName)
-	  {
-		foreach (var cert in store)
-		{
-			if (cert.SubjectName.Name == subjectName)
-				return cert;
-		}
-		return null;
-	  }
+      public static X509Certificate2 FindCertFor(X509Certificate2Collection store, string subjectName)
+      {
+         foreach (var cert in store)
+         {
+            if (cert.SubjectName.Name == subjectName)
+               return cert;
+         }
+         return null;
+      }
        
       public static string RsaPrivateKeyToPem(RSAParameters privateKey)
       {
@@ -226,7 +226,7 @@ catch
 
 try
 {
-   $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bxor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
+   $keyImportFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
    $certs = New-Object Security.Cryptography.X509Certificates.X509Certificate2Collection
    $certs.Import($pfxPath, $Passphrase, $keyImportFlags)
    if ($certs.Count -eq 1)
